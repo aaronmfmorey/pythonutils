@@ -1,7 +1,8 @@
 from pathlib import Path
 from typing import Optional
 import typer
-from pythonutils import __app_name__, __version__
+from . import __app_name__, __version__
+from pythonutils.goodreads_csv_to_json import GoodReadsCsvToJson
 
 from pythonutils import ERRORS, __app_name__, __version__, config
 
@@ -9,7 +10,13 @@ from pythonutils import ERRORS, __app_name__, __version__, config
 app = typer.Typer()
 
 @app.command()
+def goodreads_csv(
+) -> None:
+    typer.secho(f"Running Goodreads script!")
+    goodreads = GoodReadsCsvToJson()
+    goodreads.run()
 
+@app.command()
 def choose_command(
     command: str = typer.Option(
         str("Command"),
@@ -26,6 +33,8 @@ What command do you want to run?
         match command:
             case "1":
                 typer.secho(f"You selected command GoodReads", fg=typer.colors.GREEN)
+                goodreads = GoodReadsCsvToJson()
+                goodreads.run()
                 return
             case "2":
                   typer.secho(f"I said there is no number 2!", fg=typer.colors.GREEN)
