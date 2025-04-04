@@ -12,10 +12,15 @@ app = typer.Typer()
 
 @app.command()
 def goodreads_csv(
+     download_files_response: str = typer.Option(
+        str("Download Files?"),
+        "--download-files",
+        "-d",
+    ),
 ) -> None:
+    download_files = download_files_response == "1"
     typer.secho(f"Running Goodreads script!")
-    goodreads = GoodReadsCsvToJson()
-    goodreads.run()
+    GoodReadsCsvToJson.run(download_files)
 
 @app.command()
 def choose_command(
@@ -26,15 +31,14 @@ def choose_command(
         prompt="""
 What command do you want to run?
   1) GoodReads script
-  2) There is no 2
+  2) Env File Script
 """,
     ),
 ) -> None:
         match command:
             case "1":
                 typer.secho(f"You selected command GoodReads", fg=typer.colors.GREEN)
-                goodreads = GoodReadsCsvToJson()
-                goodreads.run()
+                GoodReadsCsvToJson.run()
                 return
             case "2":
                   typer.secho(f"I said there is no number 2!", fg=typer.colors.GREEN)

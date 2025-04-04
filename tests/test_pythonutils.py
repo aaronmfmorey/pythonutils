@@ -12,5 +12,11 @@ def test_version():
 
 def test_dot_env_to_keys_file():
     result = runner.invoke(cli.app, ["env-key-values -p ."])
-    assert(os.path.exists("./.env.sample"))
+    # assert(result.exit_code == 0)
+    assert(os.path.exists(".env.sample"))
     assert(dotenv_values(".env").keys() == dotenv_values(".env.sample").keys())
+
+def test_goodreads_csv_to_json():
+    result = runner.invoke(cli.app, ["goodreads-csv"])
+    assert(result.exit_code == 0)
+    # TODO AMM - add more tests here

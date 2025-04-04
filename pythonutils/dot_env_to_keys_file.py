@@ -10,3 +10,4 @@ class DotEnvToKeysFile:
         with open(f"{path}/.env.sample", "w") as text_file:
             for k, v in config.items():
                 text_file.write(f"{k}=\n")
+        return
