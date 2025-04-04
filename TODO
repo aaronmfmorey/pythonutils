@@ -1,0 +1,3 @@
+# TODO
+ - Move aaronmorey.com and content scripts here
+ - Create a scripts to build the env.sample file from the .env
