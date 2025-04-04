@@ -4,4 +4,6 @@ version = "0.0.1"
 description = "Aaron's Python Utilities"
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "configobj>=5.0.8",
+]
