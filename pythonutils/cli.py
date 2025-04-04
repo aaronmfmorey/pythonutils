@@ -3,6 +3,7 @@ from typing import Optional
 import typer
 from . import __app_name__, __version__
 from pythonutils.goodreads_csv_to_json import GoodReadsCsvToJson
+from pythonutils.dot_env_to_keys_file import DotEnvToKeysFile
 
 from pythonutils import ERRORS, __app_name__, __version__, config
 
@@ -29,7 +30,6 @@ What command do you want to run?
 """,
     ),
 ) -> None:
-        typer.secho(f"You typed: '{command}' ({type(command)})")
         match command:
             case "1":
                 typer.secho(f"You selected command GoodReads", fg=typer.colors.GREEN)
@@ -42,6 +42,17 @@ What command do you want to run?
             case _:
                 "Sorry!"
                 return
+             
+@app.command()
+def env_key_values(
+     path: str = typer.Option(
+        str("Path"),
+        "--path",
+        "-p"
+     )
+):
+    DotEnvToKeysFile.create_file(path)
+
 
 def _version_callback(value: bool) -> None:
     if value:

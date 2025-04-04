@@ -3,6 +3,7 @@ charset-normalizer==3.4.1
 click==8.1.8
 colorama==0.4.6
 configobj==5.0.8
+debugpy==1.8.13
 idna==3.10
 iniconfig==2.1.0
 markdown-it-py==3.0.0
@@ -11,6 +12,7 @@ packaging==24.2
 pluggy==1.5.0
 Pygments==2.19.1
 pytest==8.3.5
+python-dotenv==1.1.0
 pythonutils @ file:///Users/aaronmorey/Projects/pythonutils
 requests==2.32.3
 rich==14.0.0
