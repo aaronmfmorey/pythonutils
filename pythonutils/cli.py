@@ -4,9 +4,7 @@ import typer
 from . import __app_name__, __version__
 from pythonutils.goodreads_csv_to_json import GoodReadsCsvToJson
 from pythonutils.dot_env_to_keys_file import DotEnvToKeysFile
-
 from pythonutils import ERRORS, __app_name__, __version__, config
-
 
 app = typer.Typer()
 
