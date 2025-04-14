@@ -48,12 +48,12 @@ def insert_to_goodreads_db(book, cur, con):
     
 def download_book_cover(book, cover_image_directory):
     isbn = book.find('isbn').text
-    book_url = book.find('book_large_image_url').text
+    book_cover_image_url = book.find('book_large_image_url').text
     cover_path = f"{cover_image_directory}{isbn}.jpg"
     if not os.path.exists(cover_path):
         print(f"Downloading {book.find('title').text} ({book.find('isbn').text})")
         response = requests.get(
-            book_url,
+            book_cover_image_url,
             headers={
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
             }
@@ -63,7 +63,9 @@ def download_book_cover(book, cover_image_directory):
             cover_file.write(response.content)
             cover_file.close()
         else:
-            print(response)
+            print("Download failed: " + response.text + " " + str(response.status_code))
+
+download_images = False
 
 load_dotenv()
 
@@ -116,5 +118,5 @@ for b in books:
     new_book = insert_to_goodreads_db(b, cur, con)
     if new_book is not None:
         image_download_counter += 1
-        if image_download_counter < IMAGE_DOWNLOAD_MAX:
+        if image_download_counter < IMAGE_DOWNLOAD_MAX and download_images:
             download_book_cover(b, COVER_IMAGE_DIRECTORY);
