@@ -21,48 +21,53 @@ class GoodReadsCsvToSqlite:
     DB_FIELDS = [
         'book_id',
         'title',
-        'author_name',
+        'author',
         'isbn',
-        'user_rating',
-        'user_read_at', # Use ISO 8601 format for date
-        'user_review',
-        'book_published'
+        'isbn13',
+        'my_rating',
+        'date_read', # Use ISO 8601 format for date
+        'my_review',
+        'original_publication_year'
     ]
 
     def run(self, download_images = False):
-        data = []
         importFile = f"{self.CONTENT_DIRECTORY}data/goodreads_library_export.csv"
-        outputFile = f"{self.CONTENT_DIRECTORY}data/goodreads.json"
         reader = csv.DictReader(open(importFile))
         image_download_counter = 0
 
         con = sqlite3.connect(self.GOODREADS_DB)
         cur = con.cursor()
 
+        print("Creating database table if it doesn't already exist:") # TODO AMM Convert print to logging
         self.create_table_if_not_exists(cur)
+        print("Database created.")
 
         for row in reader:
             # Don't get books from other shelves besides "Read"
             if row['Exclusive Shelf'] == "read":
+                print("Processing book: ", row['Title'])
                 new_row = self.clean_up_row_data(row)
-                self.download_openlibrary_cover_image(new_row, image_download_counter, True)
+                self.download_openlibrary_cover_image(new_row, image_download_counter, False)
                 self.insert_to_goodreads_db(new_row, cur, con)
+                print("Finished")
 
-    def create_table_if_not_exists(cur):
+    def create_table_if_not_exists(self, cur):
         cur.execute('''
         CREATE TABLE IF NOT EXISTS goodreads (
             book_id INTEGER PRIMARY KEY,
             title TEXT,
-            author_name TEXT,
+            author TEXT,
             isbn TEXT,
-            user_rating INTEGER,
-            user_read_at TEXT, -- Use ISO 8601 format for date
-            user_review TEXT,
-            book_published INTEGER
+            isbn13 TEXT,
+            my_rating INTEGER,
+            date_read TEXT,
+            my_review TEXT,
+            original_publication_year INTEGER
         )
         ''')
+        # TODO AMM Use DB_FIELDS to build this table statement
 
-    def book_already_exists(book_id, cur):
+    def book_already_exists(self, book_id, cur):
         cur.execute(
             '''
                 SELECT book_id from goodreads WHERE book_id = ?
@@ -76,22 +81,24 @@ class GoodReadsCsvToSqlite:
     def insert_to_goodreads_db(self, book, cur, con):
         values = []
 
-        if (not self.book_already_exists(book.find('book_id').text, cur)):
+        if (not self.book_already_exists(book['book_id'], cur)):
             for f in self.DB_FIELDS:
-                values.append(book.find(f).text)
+                values.append(book[f])
 
-            insert_query = '''
+            value_string = ", ?" * (len(self.DB_FIELDS) - 1)
+            insert_query = f'''
                 INSERT INTO goodreads 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)       
+                VALUES (?{value_string})       
             '''
             cur.execute(insert_query, values)
             con.commit()
         
         return cur.execute('SELECT * from goodreads')
     
-    def clean_up_row_data(row):
+    def clean_up_row_data(self, row):
         isbn = row["ISBN"]
         isbn = isbn[2:-1]
+
         row["isbn"] = isbn
         row.pop("ISBN", None)
         row["isbn13"] = re.sub(r"[^0-9]", "", row["ISBN13"])
@@ -113,8 +120,10 @@ class GoodReadsCsvToSqlite:
     def download_openlibrary_cover_image(self, book, image_download_counter, download_images = False):
         coverPath = f"{self.COVER_IMAGE_DIRECTORY}{book["isbn"]}.jpg"
         url = f"https://covers.openlibrary.org/b/isbn/{book['isbn']}-M.jpg?default=false"
-        if download_images and image_download_counter < IMAGE_DOWNLOAD_MAX and not os.path.exists(coverPath):
+        if download_images and image_download_counter < self.IMAGE_DOWNLOAD_MAX and not os.path.exists(coverPath):
+            print(f"Downloading cover image for book: \"{book['title']}\"")
             image_download_counter += 1
+            print("download count: ")
             response = requests.get(
                             url,
                             headers={
