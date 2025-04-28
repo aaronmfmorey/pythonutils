@@ -69,3 +69,6 @@ class GoodReadsCsvToJson:
         with open(outputFile, "w") as text_file:
             text_file.write(jsonString)
 
+
+if __name__ == "__main__":
+    GoodReadsCsvToJson().run(True)
