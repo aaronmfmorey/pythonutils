@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Optional
 import typer
 from . import __app_name__, __version__
-from pythonutils.goodreads_csv_to_json import GoodReadsCsvToJson
+from pythonutils.goodreads_csv_to_sqlite import GoodReadsCsvToSqlite
 from pythonutils.dot_env_to_keys_file import DotEnvToKeysFile
 from pythonutils import ERRORS, __app_name__, __version__, config
 
@@ -18,7 +18,8 @@ def goodreads_csv(
 ) -> None:
     download_files = download_files_response == "1"
     typer.secho(f"Running Goodreads script!")
-    GoodReadsCsvToJson.run(download_files)
+    goodreads = GoodReadsCsvToSqlite()
+    goodreads.run(download_files)
 
 @app.command()
 def choose_command(
@@ -36,7 +37,8 @@ What command do you want to run?
         match command:
             case "1":
                 typer.secho(f"You selected command GoodReads", fg=typer.colors.GREEN)
-                GoodReadsCsvToJson.run()
+                goodreads = GoodReadsCsvToSqlite()
+                goodreads.run()
                 return
             case "2":
                   typer.secho(f"I said there is no number 2!", fg=typer.colors.GREEN)
