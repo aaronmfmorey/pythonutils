@@ -47,7 +47,7 @@ class GoodReadsCsvToSqlite:
             if row['Exclusive Shelf'] == "read":
                 print("Processing book: ", row['Title'])
                 new_row = self.clean_up_row_data(row)
-                self.download_openlibrary_cover_image(new_row, image_download_counter, False)
+                self.download_openlibrary_cover_image(new_row, image_download_counter, download_images)
                 self.insert_to_goodreads_db(new_row, cur, con)
                 print("Finished")
 
@@ -76,7 +76,6 @@ class GoodReadsCsvToSqlite:
         )
         book = cur.fetchone()
         return book is not None
-
 
     def insert_to_goodreads_db(self, book, cur, con):
         values = []
@@ -118,9 +117,9 @@ class GoodReadsCsvToSqlite:
         return newRow
 
     def download_openlibrary_cover_image(self, book, image_download_counter, download_images = False):
-        coverPath = f"{self.COVER_IMAGE_DIRECTORY}{book["isbn"]}.jpg"
+        cover_path = f"{self.COVER_IMAGE_DIRECTORY}{book["isbn"]}.jpg"
         url = f"https://covers.openlibrary.org/b/isbn/{book['isbn']}-M.jpg?default=false"
-        if download_images and image_download_counter < self.IMAGE_DOWNLOAD_MAX and not os.path.exists(coverPath):
+        if download_images and image_download_counter < self.IMAGE_DOWNLOAD_MAX and not os.path.exists(cover_path):
             print(f"Downloading cover image for book: \"{book['title']}\"")
             image_download_counter += 1
             print("download count: ")
@@ -131,9 +130,12 @@ class GoodReadsCsvToSqlite:
                             }
                         )
             if response.ok:
-                coverFile = open(coverPath, 'wb')
+                coverFile = open(cover_path, 'wb')
                 coverFile.write(response.content)
                 coverFile.close()
             else:
                 print(response)
 
+if __name__ == "__main__":
+    goodreads = GoodReadsCsvToSqlite()
+    goodreads.run(True)
