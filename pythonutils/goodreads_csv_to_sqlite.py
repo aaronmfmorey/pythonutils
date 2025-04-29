@@ -104,17 +104,17 @@ class GoodReadsCsvToSqlite:
         row.pop("ISBN13", None)
         row['url'] = f"https://covers.openlibrary.org/b/isbn/{isbn}-M.jpg?default=false"
                 
-        newRow = {}
+        new_row = {}
         for k, v in row.items():
-            betterKey = k.lower()
-            betterKey = betterKey.replace(" ", "_")
-            newRow[betterKey] = v
+            better_key = k.lower()
+            better_key = better_key.replace(" ", "_")
+            new_row[better_key] = v
 
-        if newRow['date_read'] == "":
-            newRow['date_read'] = newRow['date_added']
+        if new_row['date_read'] == "":
+            new_row['date_read'] = new_row['date_added']
 
-        newRow['year'] = datetime.strptime(newRow['date_read'], '%Y/%m/%d').strftime('%Y')
-        return newRow
+        new_row['year'] = datetime.strptime(new_row['date_read'], '%Y/%m/%d').strftime('%Y')
+        return new_row
 
     def download_openlibrary_cover_image(self, book, image_download_counter, download_images = False):
         cover_path = f"{self.COVER_IMAGE_DIRECTORY}{book["isbn"]}.jpg"
@@ -130,9 +130,9 @@ class GoodReadsCsvToSqlite:
                             }
                         )
             if response.ok:
-                coverFile = open(cover_path, 'wb')
-                coverFile.write(response.content)
-                coverFile.close()
+                cover_file = open(cover_path, 'wb')
+                cover_file.write(response.content)
+                cover_file.close()
             else:
                 print(response)
 
