@@ -102,7 +102,7 @@ class GoodReadsCsvToSqlite:
         row.pop("ISBN", None)
         row["isbn13"] = re.sub(r"[^0-9]", "", row["ISBN13"])
         row.pop("ISBN13", None)
-        row['url'] = f"https://covers.openlibrary.org/b/isbn/{isbn}-M.jpg?default=false"
+        row['url'] = f"https://covers.openlibrary.org/b/isbn/{isbn}-L.jpg?default=false"
                 
         new_row = {}
         for k, v in row.items():
