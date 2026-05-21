@@ -2,6 +2,8 @@
 import csv
 import os
 import re
+from linecache import updatecache
+
 import requests
 import sqlite3
 from datetime import datetime
@@ -30,6 +32,7 @@ DB_FIELDS = [
     "date_read",  # Use ISO 8601 format for date
     "my_review",
     "original_publication_year",
+    "number_of_pages",
 ]
 
 
@@ -71,7 +74,8 @@ def create_table_if_not_exists(cur):
         my_rating INTEGER,
         date_read TEXT,
         my_review TEXT,
-        original_publication_year INTEGER
+        original_publication_year INTEGER,
+        number_of_pages INTEGER
     )
     """
     )
@@ -93,6 +97,16 @@ def insert_to_goodreads_db(book, cur, con):
     values = []
 
     if not book_already_exists(book["book_id"], cur):
+        # Fix date format from MM/DD/YYYY to YYYY-MM-DD 00:00:00
+        try:
+            date_object = datetime.strptime(book["date_read"], "%Y/%m/%d").replace(
+                hour=0, minute=0, second=0
+            )
+            book["date_read"] = date_object.strftime("%Y-%m-%d %H:%M:%S")
+        except:
+            print(book)
+            print("Hwat in tarnation?")
+
         for f in DB_FIELDS:
             values.append(book[f])
 
@@ -103,6 +117,19 @@ def insert_to_goodreads_db(book, cur, con):
         """
         cur.execute(insert_query, values)
         con.commit()
+    # else:
+    # if book["date_read"] != "":
+    #     date_object = datetime.strptime(book["date_read"], "%Y/%m/%d")
+    #     formatted_string = date_object.strftime("%Y-%m-%d %H:%M:%S")
+    #     print(formatted_string)
+    #     update_query = f"""
+    #         UPDATE goodreads
+    #         SET date_read = '{formatted_string}'
+    #         WHERE book_id = {book['book_id']}
+    #     """
+    #     print(update_query)
+    #     cur.execute(update_query)
+    #     con.commit()
 
     return cur.execute("SELECT * from goodreads")
 
