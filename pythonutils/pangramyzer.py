@@ -6,14 +6,14 @@
 ██║     ██║  ██║██║ ╚████║╚██████╔╝██║  ██║██║  ██║██║ ╚═╝ ██║   ██║   ███████╗███████╗██║  ██║
 ╚═╝     ╚═╝  ╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝     ╚═╝   ╚═╝   ╚══════╝╚══════╝╚═╝  ╚═╝
 
+A tool to solve the New York Time's Spelling Bee game. This is even more cheat-y than the Wordlyzer,
+but it was fun to write.
 """
 
 from english_dictionary.scripts.read_pickle import get_dict
 import re
 from nltk.corpus import words
 
-# RE_FIVE_LETTERS_OR_UNDERSCORES = r"^[a-zA-Z]{7}$"
-# RE_SEVEN_LETTERS = r"^[a-zA-Z]+$"
 LETTERS_COUNT = 7
 RE_SEVEN_LETTERS = r"^[a-zA-Z]{7}$"
 
