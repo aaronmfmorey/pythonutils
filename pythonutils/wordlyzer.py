@@ -20,7 +20,7 @@ whether you'd like to see spoilers. Seeing spoilers means the remaining words ar
 out. "No Spoilers" means it will just output a count of remaining words at the end.
 """
 
-from english_dictionary.scripts.read_pickle import get_dict
+from nltk.corpus import words
 import re
 
 RE_FIVE_LETTERS_OR_UNDERSCORES = r"^[a-zA-Z_]{5}$"
@@ -71,18 +71,18 @@ def get_inputs():
 
 
 if __name__ == "__main__":
-    english_dict = get_dict()
+    english_dict = words.words()
     regex_string, eliminated, spoilers, uncertain_letters = get_inputs()
     match_count = 0
 
-    for word in english_dict.keys():
+    for word in english_dict:
         if len(word) == 5 and re.fullmatch(regex_string, word):
             letter_set = set(word)
             if letter_set.isdisjoint(eliminated) and (
                 uncertain_letters == () or letter_set.issuperset(uncertain_letters)
             ):
                 if spoilers:
-                    print(f"{word}{english_dict[word]}")
+                    print(f"{word}")
                 match_count += 1
 
     print("Remaining possible words: " + str(match_count))
