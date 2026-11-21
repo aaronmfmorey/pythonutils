@@ -45,7 +45,8 @@ if __name__ == "__main__":
     letter_set = set(letters)
     match_found = False
 
-    for word in words.words():  # english_dict.keys():
+    for word in words.words():
+        # Pare down the search scope
         if len(word) < LETTERS_COUNT and word[0] not in letter_set:
             continue
         else:
