@@ -54,8 +54,8 @@ def run(download_images=False):
         # Don't get books from other shelves besides "Read"
         if row["Exclusive Shelf"] == "read":
             print("Processing book: ", row["Title"])
-            new_row = clean_up_row_data(row)
-            download_openlibrary_cover_image(
+            new_row = sanitize_row_data(row)
+            image_download_counter = download_openlibrary_cover_image(
                 new_row, image_download_counter, download_images
             )
             insert_to_goodreads_db(new_row, cur, con)
@@ -134,7 +134,7 @@ def insert_to_goodreads_db(book, cur, con):
     return cur.execute("SELECT * from goodreads")
 
 
-def clean_up_row_data(row):
+def sanitize_row_data(row):
     isbn = row["ISBN"]
     isbn = isbn[2:-1]
 
@@ -166,6 +166,7 @@ def download_openlibrary_cover_image(
         download_images
         and image_download_counter < IMAGE_DOWNLOAD_MAX
         and not os.path.exists(cover_path)
+        and len(book["isbn"]) > 0
     ):
         print(f"Downloading cover image for book: \"{book['title']}\"")
         image_download_counter += 1
@@ -183,10 +184,12 @@ def download_openlibrary_cover_image(
         else:
             print(f"Download Failed: {response.status_code} {response.reason}")
 
+    return image_download_counter
+
 
 if __name__ == "__main__":
     load_dotenv()
     COVER_IMAGE_DIRECTORY = os.getenv("GOODREADS_COVER_IMAGE_DIRECTORY")
     CONTENT_DIRECTORY = os.getenv("CONTENT_DIRECTORY")
     GOODREADS_DB = os.getenv("GOODREADS_DB")
-    run(False)
+    run(True)
